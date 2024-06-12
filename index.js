@@ -1,12 +1,32 @@
-const url = 'https://json-server--3000.local.webcontainer.io/comments';
+// importaciones
+const conecct = require('./DB/Connection');
+const express = require('express');
+const cors = require('cors');
 
-fetch(url)
-  .then((r) => r.json())
-  .then(
-    (json) =>
-      (document.getElementById('output').innerHTML = JSON.stringify(
-        json,
-        null,
-        2
-      ))
-  );
+// conexion BD
+conecct();
+
+// server
+const app = express();
+const puerto = 3900;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+
+app.get('/t', (req, res)=>{
+  res.status(200).json({
+    name: 'Yo'
+  })
+})
+
+app.listen(puerto, ()=>{
+  console.log(`Servidor iniciado en ${puerto}`);
+})
+// Conf CORS
+
+// Conf Body JSON
+
+// Rutas
+
+// Peticiones
