@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
-const connect = async ()=>{
-    try {
-        await mongoose.connect('mongodb+srv://Ricardo:6fJztoQygU4VvmJk@cluster0.77fg4.azure.mongodb.net/Colegio10?retryWrites=true&w=majority&appName=Cluster0');
-        console.log('BD conectada');
-    } catch (error) {
-        console.error('Error al conectar la BD');
-        throw new error('Error al conectar la BD');
-    }
+const connect = ()=>{
+        mongoose.connect('mongodb+srv://Ricardo:FduAHrNkzPiS8Awf@cluster0.77fg4.azure.mongodb.net/PracticeTech?retryWrites=true&w=majority', {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 30000
+        })   
+     .then(() => console.log("Database connected!"))
+     .catch(err => console.log(err));
 }
 
 module.exports = connect;
