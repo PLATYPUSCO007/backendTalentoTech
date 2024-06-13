@@ -4,9 +4,11 @@
   "scripts": {
     "frontend": "http-server",
     "backend": "json-server -w db.json",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bcrypt-nodejs": "^0.0.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",

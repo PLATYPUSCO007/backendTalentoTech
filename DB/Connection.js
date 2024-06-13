@@ -1,13 +1,15 @@
 const mongoose = require('mongoose');
 
 const connect = ()=>{
-        mongoose.connect('mongodb+srv://Ricardo:FduAHrNkzPiS8Awf@cluster0.77fg4.azure.mongodb.net/PracticeTech?retryWrites=true&w=majority', {
+        mongoose.connect('mongodb+srv://Ricardo:PruebaMongo2024@cluster0.77fg4.azure.mongodb.net/PracticeTech', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
-            serverSelectionTimeoutMS: 30000
         })   
-     .then(() => console.log("Database connected!"))
-     .catch(err => console.log(err));
+     .then(console.log("Database connected!"))
+     .catch(err => {
+        console.log(err);
+        // process.exit(1);
+    });
 }
 
 module.exports = connect;

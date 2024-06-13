@@ -9,9 +9,9 @@ const apiRoutes = require('./Routes/Index.routes');
 const app = express();
 const puerto = 3900;
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cors());
 
 // conexion BD
 connect();
@@ -19,6 +19,7 @@ connect();
 app.use('/api', apiRoutes);
 
 app.listen(puerto, ()=>{
+  console.log(process.env.GITHUB_TOKEN);
   console.log(`Servidor iniciado en ${puerto}`);
 })
 // Conf CORS
