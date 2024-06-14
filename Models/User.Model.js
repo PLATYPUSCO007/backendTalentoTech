@@ -47,6 +47,10 @@ UserSchema.pre('save', async function(next){
   } catch (error) {
     next(error);
   }
-})
+});
+
+UserSchema.methods.comparePasswords = async function(candidatePass){
+  return bcrypt.compare(candidatePass, this.password);
+}
 
 module.exports = model('User', UserSchema, "users")

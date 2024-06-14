@@ -1,4 +1,6 @@
 const {UserModel} = require('../Models/Index.models');
+const {generateToken} = require('../Services/JWT.service');
+const {ERROR, SUCCESS} = require('../enum/status_response.enum');
 
 const userTest = [
     "name",
@@ -15,23 +17,80 @@ const validateObject = (obj, array_props)=>{
 }
 
 const UserController = {
-    getUser: (req, res)=>{
-        res.status(200).json({resp: 'Mi response data'});
-    },
-    createUser: async (req, res)=>{
+    authUser: async (req, res)=>{
         try {
-            
-            res.status(200).send('Usuario creado');
+            const params = req.body;
+            if(!params.email || !params.password){
+                res.status(500).json({
+                    status: ERROR,
+                    msg: 'Faltan datos'
+                });
+                return;
+            }
+            const user = await UserModel.findOne({email: params.email}).exec();
+            if (!user) {
+                res.status(500).json({
+                    status: ERROR,
+                    msg: 'Este usuario no existe'
+                });
+                return;
+            }
+            const isMatch = await user.comparePasswords(params.password);
+            if (!isMatch) {
+                res.status(404).json({
+                    status: ERROR,
+                    msg: 'Informacion incorrecta'
+                });
+                return;
+            }
+            const token = generateToken(user);
+            res.status(200).json(
+                {
+                    status: SUCCESS,
+                    msg: `Bienvenido ${params.email}`,
+                    token,
+                    user: {
+                        name: user.name,
+                        last_name: user.last_name,
+                        nick: user.nick,
+                        email: user.email,
+                        password: user.password,
+                        role: user.role,
+                        image: user.image,
+                        created_at: user.created_at
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('Error al iniciar sesion', error);
+            res.status(500).json({
+                status: ERROR,
+                error: error
+            })
+        }
+    },
+    getUsers: async (req, res)=>{
+        try {
+            res.status(200).json({
+                status: SUCCESS,
+                msg: `Usuario logueado ${req.user.name}`
+            });
         } catch (error) {
             console.error('Error al registrar el usuario', error);
-            res.status(500).json({error: error})
+            res.status(500).json({
+                status: ERROR,
+                error: error
+            });
         }
     },
     postUser: async (req, res)=>{
         try {
             const params = req.body;
             if (!validateObject(params, userTest)) {
-                res.status(400).send('Faltan campos para registrar el usuario');
+                res.status(400).json({
+                    status: ERROR,
+                    msg: 'Faltan campos para registrar el usuario'
+                });
                 return;
             }
             const newUser = new UserModel(params);
@@ -42,14 +101,23 @@ const UserController = {
                 ]
             }).exec();
             if (existUser) {
-                res.status(200).send('El usuario ya existe');
+                res.status(200).json({
+                    status: SUCCESS,
+                    msg: 'El usuario ya existe'
+                });
                 return;
             }
             await newUser.save();
-            res.status(200).send('Usuario creado');
+            res.status(200).json({
+                status: SUCCESS,
+                msg: 'Usuario creado'
+            });
         } catch (error) {
             console.error('Error al registrar el usuario', error);
-            res.status(500).json({error: error})
+            res.status(500).json({
+                status: ERROR,
+                error: error
+            })
         }
     }
 }
