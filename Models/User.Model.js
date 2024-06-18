@@ -1,5 +1,6 @@
 const {Schema, model} = require('mongoose');
 const bcrypt = require('bcrypt');
+const mongoosePagination = require('mongoose-paginate-v2');
 
 const UserSchema = new Schema({
     name: {
@@ -30,11 +31,14 @@ const UserSchema = new Schema({
         type: String,
         default: "default.png"
       },
+      bio: String,
       created_at: {
         type: Date,
         default: Date.now
       }
 });
+
+UserSchema.plugin(mongoosePagination);
 
 UserSchema.pre('save', async function(next){
   const user = this;
