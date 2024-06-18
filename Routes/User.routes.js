@@ -10,6 +10,6 @@ router.get('/profile/:id', userController.getProfileById);
 router.get('/list/:page?/:limit?', userController.getAllUsersPaginate);
 router.put('/update', AuthMiddleware, userController.updateUser);
 router.post('/uploadFile', [AuthMiddleware, UploadFilesMiddleware.single('file0')], userController.uploadFile);
-router.get('/update', [AuthMiddleware, UploadFilesMiddleware.single('file0')], userController.uploadFile);
+router.get('/getFile/:nameFile', AuthMiddleware, userController.getFile);
 
 module.exports = router;

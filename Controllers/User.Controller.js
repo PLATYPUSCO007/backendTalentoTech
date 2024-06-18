@@ -1,3 +1,4 @@
+const path = require('path');
 const {UserModel} = require('../Models/Index.models');
 const {generateToken} = require('../Services/JWT.service');
 const {ERROR, SUCCESS} = require('../enum/status_response.enum');
@@ -314,7 +315,37 @@ const UserController = {
 
             return;
         } catch (error) {
-            console.error('Error al actualizar usuario ', error);
+            console.error('Error al subir el archivo ', error);
+            return res.status(400).json({
+                status: ERROR,
+                msg: error
+            });
+        }
+    },
+
+    getFile: async (req, res)=>{
+        try {
+    
+            if (!req.params.nameFile) return res.status(400).json({
+                status: ERROR,
+                msg: 'No hay un nombre de archivo para consultar'
+            });
+
+            const {nameFile} = req.params;
+            const filePath = `./uploads/avatars/${nameFile}`;
+
+            fs.stat(filePath, (error, stats)=>{
+                if (error) return res.status(400).json({
+                    status: ERROR,
+                    msg: 'El archivo no existe'
+                });
+
+                res.status(200).sendFile(path.resolve(filePath));
+                return;
+            })
+
+        } catch (error) {
+            console.error('Error al consultar la imagen ', error);
             return res.status(400).json({
                 status: ERROR,
                 msg: error
