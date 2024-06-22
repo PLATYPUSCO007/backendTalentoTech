@@ -1,7 +1,7 @@
 const jwt = require('jwt-simple');
 const moment = require('moment');
 
-const SECRET_PASS = crypto.randomUUID();
+const SECRET_PASS =  'yo'; //crypto.randomUUID();
 
 const generateToken = (user)=>{
     const payload = {

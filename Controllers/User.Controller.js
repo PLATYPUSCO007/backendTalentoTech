@@ -94,13 +94,11 @@ const UserController = {
     postUser: async (req, res)=>{
         try {
             const params = req.body;
-            if (!validateObject(params, userTest)) {
-                res.status(400).json({
+            if (!validateObject(params, userTest)) return res.status(400).json({
                     status: ERROR,
                     msg: 'Faltan campos para registrar el usuario'
                 });
-                return;
-            }
+                
             const newUser = new UserModel(params);
             const existUser = await UserModel.findOne({
                 $or: [
@@ -153,7 +151,6 @@ const UserController = {
             })
         }
     },
-
     getAllUsersPaginate: async (req, res)=>{
         try {
             const page = parseInt(req.params.page) || 1;
@@ -174,6 +171,8 @@ const UserController = {
                 });
                 return;
             }
+
+            //TODO Array de usuarios
 
             res.status(200).json({
                 status: SUCCESS,
@@ -199,7 +198,6 @@ const UserController = {
             });
         }
     },
-
     updateUser: async (req, res)=>{
         try {
 
