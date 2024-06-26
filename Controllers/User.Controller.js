@@ -3,6 +3,7 @@ const {UserModel} = require('../Models/Index.models');
 const {generateToken} = require('../Services/JWT.service');
 const {ERROR, SUCCESS} = require('../enum/status_response.enum');
 const fs = require('fs');
+const {FollowServices} = require('../Services/index.services');
 
 const userTest = [
     "name",
@@ -173,6 +174,7 @@ const UserController = {
             }
 
             //TODO Array de usuarios
+            const followsUsers = await FollowServices.arrayFollowingAndFollowed(req.user.userId);
 
             res.status(200).json({
                 status: SUCCESS,
@@ -186,6 +188,8 @@ const UserController = {
                 prevPage: users.prevPage,
                 nextPage: users.nextPage,
                 limit: users.limit,
+                usersFollowing: followsUsers.dataFollowings,
+                usersFollowers: followsUsers.dataFollowers
             });
 
             return;

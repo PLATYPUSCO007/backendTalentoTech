@@ -2,7 +2,6 @@ const {FollowModel, UserModel} = require('../Models/Index.models');
 const {ERROR, SUCCESS} = require('../enum/status_response.enum');
 const {ValidateObjectHelper} = require('../Helpers/Index.helper');
 const {FollowServices} = require('../Services/index.services');
-const FollowService = require('../Services/Follow.service');
 
 const followTest = [
     "followed_user"
@@ -77,7 +76,7 @@ const FollowController = {
             })
         }
     },
-    postUnfollow: async (req, res)=>{
+    deletefollow: async (req, res)=>{
         try {
 
             if (!req.user) return res.status(400).json({
@@ -119,23 +118,37 @@ const FollowController = {
 
             //Consultar ID de perfil personal o de otro usuario (prioridad)
             const userId = req.params.id ?? req.user.userId;
-            let page = req.params.page ?? 1;
-            let itemsByPage = 5;
+            let page = parseInt(req.params.page, 10) ?? 1;
+            let itemsByPage = parseInt(req.query.limit) ?? 5;
 
             const options = {
-
+                page,
+                limit: itemsByPage,
+                populate: {
+                    path: 'followed_user',
+                    select: excludeFieldsUser
+                },
+                lean: true
             }
 
-            const follows = await FollowModel.find({following_user: userId}).exec();
-
+            const follows = await FollowModel.paginate({following_user: userId}, options);
+        
             if (!follows) return res.status(200).json({
                 status: ERROR,
                 msg: 'No hay seguidores'
             });
 
+            const followers = await FollowServices.arrayFollowingAndFollowed(req.user.userId);
+
             res.status(200).json({
                 status: SUCCESS,
-                follows
+                follows: follows.docs,
+                total: follows.totalDocs,
+                pages: follows.totalPages,
+                page: follows.page,
+                limit: follows.limit,
+                usersFollowing: followers.dataFollowings,
+                usersFollowers: followers.dataFollowers,
             });
 
             return;
@@ -186,11 +199,44 @@ const FollowController = {
     },
     followers: async (req, res)=>{
         try {
-            const data = await FollowService.arrayFollowingAndFollowed(req.user.userId);
+
+            //Consultar ID de perfil personal o de otro usuario (prioridad)
+            const userId = req.params.id ?? req.user.userId;
+            let page = parseInt(req.params.page, 10) ?? 1;
+            let itemsByPage = parseInt(req.query.limit) ?? 5;
+
+            const options = {
+                page,
+                limit: itemsByPage,
+                populate: {
+                    path: 'following_user',
+                    select: excludeFieldsUser
+                },
+                lean: true
+            }
+
+            const follows = await FollowModel.paginate({followed_user: userId}, options);
+        
+            if (!follows) return res.status(200).json({
+                status: ERROR,
+                msg: 'No hay seguidores'
+            });
+
+            const followers = await FollowServices.arrayFollowingAndFollowed(req.user.userId);
+
             res.status(200).json({
                 status: SUCCESS,
-                data
-            })    
+                follows: follows.docs,
+                total: follows.totalDocs,
+                pages: follows.totalPages,
+                page: follows.page,
+                limit: follows.limit,
+                usersFollowing: followers.dataFollowings,
+                usersFollowers: followers.dataFollowers,
+            });
+
+            return;
+
         } catch (error) {
             console.error('Error al retornar los follows', error);
             return res.status(500).json({
@@ -198,8 +244,7 @@ const FollowController = {
                 error: error
             })
         }
-        
-    }
+    },
 }
 
 module.exports = FollowController;

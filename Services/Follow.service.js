@@ -35,21 +35,19 @@ const FollowService = {
 
             let dataFollowings = await FollowModel.find({
                 following_user: identityId
-            }).exec();
+            }).select({'followed_user': 1, '_id': 0}).exec();
 
             let dataFollowers = await FollowModel.find({
                 followed_user: identityId
-            }).exec();
+            }).select({'following_user': 1, '_id': 0}).exec();
 
-            dataFollowings = dataFollowings.map(data=>data.followed_user);
+            dataFollowings = dataFollowings.map(data=>data.followed_user); 
             dataFollowers = dataFollowers.map(data=>data.following_user);
 
             const followData = {
                 dataFollowings,
                 dataFollowers
             }
-
-            console.log('DataFollow ', followData);
 
             return followData;
 
